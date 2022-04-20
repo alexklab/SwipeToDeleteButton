@@ -17,11 +17,10 @@
 package com.example.swipetodeletebutton.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
-import com.example.swipetodeletebutton.adapter.swipe.SimpleSwipeViewHolder
+import com.example.swipetodeletebutton.adapter.swipe.RightButtonSwipeViewHolder
 import com.example.swipetodeletebutton.adapter.swipe.SwipeViewHolder
 import com.example.swipetodeletebutton.data.TextItem
 import com.example.swipetodeletebutton.databinding.SimpleTextItemBinding
@@ -32,16 +31,14 @@ class TextItemViewHolder(
     private val binding: SimpleTextItemBinding = SimpleTextItemBinding
         .inflate(LayoutInflater.from(parent.context), parent, false),
 
-    private val swipeViewHolderDelegate: SwipeViewHolder = object : SimpleSwipeViewHolder() {
-        override val contentView: View get() = binding.textView
-        override val buttonsView: View get() = binding.deleteButton
-        override val offsetLimit: Float get() = -binding.deleteButton.width.toFloat()
-    }
-
+    private val swipeViewHolderDelegate: SwipeViewHolder = RightButtonSwipeViewHolder(
+        buttonView = binding.deleteButton,
+        contentView = binding.textView
+    )
 ) : SwipeViewHolder by swipeViewHolderDelegate, BaseViewHolder<TextItem>(binding.root) {
 
     override fun onBind(item: TextItem) = with(binding) {
-        resetOffsets()
+        resetView()
         textView.text = item.name
         textView.setBackgroundColor(getBackgroundColor(item.isRemovable))
         deleteButton.isVisible = item.isRemovable

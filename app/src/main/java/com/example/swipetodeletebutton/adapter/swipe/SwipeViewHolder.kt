@@ -18,34 +18,27 @@ package com.example.swipetodeletebutton.adapter.swipe
 
 interface SwipeViewHolder {
 
-    val offsetLimit: Float
-
-    val swipeBouncingWidth: Float
-
+    /**
+     * Return true if holder can be swiped, false otherwise
+     */
     fun isScrollable(): Boolean
 
-    fun getContentOffset(): Float
+    /**
+     * Called when user swipe view,
+     * if dX > 0 than this is swiping to right
+     * if dX < 0 than this is swiping to left
+     * if dX == 0 than this is very firs swiping touch
+     */
+    fun onSwipe(dX: Float)
 
-    fun getButtonsOffset(): Float {
-        return getContentOffset()
-    }
+    /**
+     * Called  when the user interaction with an element is over and it also completed its animation.
+     */
+    fun onSwipeComplete()
 
-    fun setButtonsOffset(offset: Float)
-
-    fun setContentOffset(offset: Float)
-
-    fun animateButtonsOffset(offset: Float)
-
-    fun animateContentOffset(offset: Float)
-
-    fun resetOffsets(animated: Boolean = false) {
-        if (animated) {
-            animateContentOffset(0f)
-            animateButtonsOffset(0f)
-        } else {
-            setContentOffset(0f)
-            setButtonsOffset(0f)
-        }
-    }
+    /**
+     * Reset view to initial state
+     */
+    fun resetView(animated: Boolean = false)
 
 }

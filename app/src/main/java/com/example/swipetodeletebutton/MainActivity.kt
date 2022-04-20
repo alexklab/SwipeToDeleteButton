@@ -47,7 +47,8 @@ class MainActivity : AppCompatActivity(), ItemsAdapter.OnClickListener {
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         ItemTouchHelper(SwipeCallback())
             .attachToRecyclerView(recyclerView)
-
+        ItemTouchHelper(SwipeCallback())
+            .attachToRecyclerView(recyclerView)
         itemsAdapter.submitList(getData())
     }
 
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity(), ItemsAdapter.OnClickListener {
             .setMessage("Are you sure profile '${item.name}' will be permanently deleted?")
             .setNegativeButton(android.R.string.cancel) { d, _ ->
                 d.dismiss()
-                holder.resetOffsets(animated = true)
+                holder.resetView(animated = true)
             }.setPositiveButton(android.R.string.ok) { d, _ ->
                 d.dismiss()
                 itemsAdapter.removeItemAt(holder.adapterPosition)

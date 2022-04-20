@@ -18,11 +18,10 @@ package com.example.swipetodeletebutton.adapter
 
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
-import com.example.swipetodeletebutton.adapter.swipe.SimpleSwipeViewHolder
+import com.example.swipetodeletebutton.adapter.swipe.RightButtonSwipeViewHolder
 import com.example.swipetodeletebutton.adapter.swipe.SwipeViewHolder
 import com.example.swipetodeletebutton.data.Profile
 import com.example.swipetodeletebutton.databinding.ProfileItemViewBinding
@@ -33,20 +32,18 @@ class ProfileViewHolder(
     private val binding: ProfileItemViewBinding = ProfileItemViewBinding
         .inflate(LayoutInflater.from(parent.context), parent, false),
 
-    private val swipeViewHolderDelegate: SwipeViewHolder = object : SimpleSwipeViewHolder() {
-        private val buttonMargin = binding.root.dpTtoPx(16f)
-        override val contentView: View get() = binding.cardView
-        override val buttonsView: View get() = binding.removeButton
-        override val offsetLimit: Float get() = -binding.removeButton.width - buttonMargin
-        override val swipeBouncingWidth: Float = 24.toPx()
-    }
-
+    private val swipeViewHolderDelegate: SwipeViewHolder = RightButtonSwipeViewHolder(
+        contentView = binding.cardView,
+        buttonView = binding.removeButton,
+        buttonMargin = binding.root.dpTtoPx(16f),
+        swipeBouncingWidth = 24.toPx()
+    )
 ) : SwipeViewHolder by swipeViewHolderDelegate, BaseViewHolder<Profile>(binding.root) {
 
     private var lastItemUid: Int? = null
 
     override fun onBind(item: Profile) = with(binding) {
-        resetOffsets(animated = item.uid == lastItemUid)
+        resetView(animated = item.uid == lastItemUid)
         lastItemUid = item.uid
 
         nameTextView.text = item.name

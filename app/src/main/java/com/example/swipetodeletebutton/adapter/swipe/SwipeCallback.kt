@@ -19,13 +19,8 @@ package com.example.swipetodeletebutton.adapter.swipe
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 class SwipeCallback : SimpleCallback(ACTION_STATE_IDLE, LEFT or RIGHT) {
-
-    private var currentOffset = 0f
 
     private var activeHolder: SwipeViewHolder? = null
 
@@ -71,7 +66,12 @@ class SwipeCallback : SimpleCallback(ACTION_STATE_IDLE, LEFT or RIGHT) {
         // onSwipe allowed only for SwipeViewHolder
         if (viewHolder !is SwipeViewHolder) return
 
-        onSwipe(viewHolder, dX)
+        if (viewHolder != activeHolder) {
+            activeHolder?.resetView(animated = true)
+            activeHolder = viewHolder
+        }
+
+        viewHolder.onSwipe(dX)
     }
 
     override fun clearView(
@@ -79,77 +79,6 @@ class SwipeCallback : SimpleCallback(ACTION_STATE_IDLE, LEFT or RIGHT) {
         viewHolder: RecyclerView.ViewHolder
     ) {
         super.clearView(recyclerView, viewHolder)
-        if (viewHolder is SwipeViewHolder) finalizeOffsets(viewHolder)
+        if (viewHolder is SwipeViewHolder) viewHolder.onSwipeComplete()
     }
-
-    private fun onSwipe(viewHolder: SwipeViewHolder, dX: Float) {
-        if (viewHolder != activeHolder) {
-            activeHolder?.resetOffsets(animated = true)
-            activeHolder = viewHolder
-        }
-
-        if (dX == 0f) {
-            currentOffset = viewHolder.getContentOffset()
-        }
-
-        val minOffset = viewHolder.offsetLimit
-        val offset = getOffset(
-            offset = currentOffset + dX,
-            minOffset = minOffset
-        )
-
-        if (dX > 0) {
-            if (viewHolder.getContentOffset() < minOffset) {
-                viewHolder.setContentOffset(min(offset, minOffset))
-            } else {
-                viewHolder.setButtonsOffset(offset)
-                viewHolder.setContentOffset(offset)
-            }
-        } else {
-            val bouncingOffset = getBouncingOffset(
-                offset = currentOffset + dX,
-                minOffset = minOffset,
-                bouncingWidth = viewHolder.swipeBouncingWidth
-            )
-            viewHolder.setButtonsOffset(offset)
-            viewHolder.setContentOffset(bouncingOffset)
-        }
-    }
-
-    private fun finalizeOffsets(holder: SwipeViewHolder) {
-        val minOffset = holder.offsetLimit
-
-        // autoscroll if reached 30% of min offset
-        val autoscrollOffset = 0.3f * minOffset
-
-        val contentOffset = holder.getContentOffset()
-        val offset = if (contentOffset + autoscrollOffset < minOffset) minOffset else 0f
-        holder.animateContentOffset(offset)
-        holder.animateButtonsOffset(offset)
-    }
-
-    private fun getBouncingOffset(minOffset: Float, bouncingWidth: Float, offset: Float): Float {
-        val minBouncingOffset = minOffset - bouncingWidth
-        return when {
-            offset > 0 -> 0f
-            offset < minBouncingOffset -> minBouncingOffset
-
-            offset < minOffset -> {
-                val diff = offset - minOffset
-                val decreaseFactor = interpolate(abs(diff) / bouncingWidth)
-                max(minBouncingOffset, minOffset + diff * decreaseFactor)
-            }
-
-            else -> offset
-        }
-    }
-
-    private fun getOffset(minOffset: Float, offset: Float): Float = when {
-        offset < minOffset -> minOffset
-        offset > 0f -> 0f
-        else -> offset
-    }
-
-    private fun interpolate(input: Float): Float = (1.0f - (1.0f - input) * (1.0f - input))
-
 }

@@ -16,9 +16,12 @@
 
 package com.example.swipetodeletebutton.adapter
 
+import android.animation.ObjectAnimator
 import android.content.res.Resources
 import android.graphics.Color
 import android.view.View
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.Interpolator
 import androidx.annotation.ColorInt
 
 fun Int.toPx(): Float = this * Resources.getSystem().displayMetrics.density
@@ -32,5 +35,20 @@ fun String.toColor(): Int {
         Color.parseColor(this)
     } catch (e: Exception) {
         Color.TRANSPARENT
+    }
+}
+
+fun View.animateTranslationX(
+    value: Float,
+    animationDuration: Long = 400,
+    animationInterpolator: Interpolator = DecelerateInterpolator()
+): ObjectAnimator? {
+    val view = this@animateTranslationX
+    if (view.translationX == value) return null
+
+    return ObjectAnimator.ofFloat(view, "translationX", value).apply {
+        duration = animationDuration
+        interpolator = animationInterpolator
+        start()
     }
 }
